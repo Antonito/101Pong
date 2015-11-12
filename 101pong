@@ -21,10 +21,10 @@ def main():
     print "(%.2f;%.2f;%.2f)" %(x2-x1, y2-y1, z2-z1)
     print "At time t+%d, ball coordinates will be :" %n
     print "(%.2f;%.2f;%.2f)" %(x3, y3, z3)
-    if (z2-z1 == 0):
-        print >> sys.stderr, "Can't divide by 0"
-        sys.exit(84)
-    if ((-z2/(z2-z1)) < 0):
+    if ((z2-z1 == 0) & (z2 != 0)):
+        print "The ball won't reach the bat."
+        sys.exit(0)
+    if (-z2/(z2-z1) < 0):
         print "The ball won't reach the bat."
         sys.exit(0)
     angle = 90-(acos(abs(z2-z1)/sqrt(pow(x2-x1, 2)+pow(y2-y1, 2)+pow(z2-z1, 2))))*180/math.pi
