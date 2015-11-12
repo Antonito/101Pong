@@ -14,7 +14,7 @@ def main():
     except ValueError:
         print >> sys.stderr, "./101pong.py x0 y0 z0 x1 y1 z1 n"
         sys.exit(84)
-    print "The speed vector coordinates are:"
+    print "The speed vector coordinates are :"
     print "(%.2f;%.2f;%.2f)" %(x2-x1, y2-y1, z2-z1)
     print "At time t+%d, ball coordinates will be :" %n
     print "(%.2f;%.2f;%.2f)" %(x3, y3, z3)
