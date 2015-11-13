@@ -28,6 +28,9 @@ def main():
         print "The ball won't reach the bat."
         sys.exit(0)
     angle = 90-(acos(abs(z2-z1)/sqrt(pow(x2-x1, 2)+pow(y2-y1, 2)+pow(z2-z1, 2))))*180/math.pi
+    if (angle == 0):
+        print >> sys.stderr, "The ball won't reach the bat."
+        sys.exit(84)
     print "The incidence angle is :"
     print "%.2f degrees" % angle
     sys.exit(0)
