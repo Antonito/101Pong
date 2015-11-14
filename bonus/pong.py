@@ -2,6 +2,7 @@
 import pygame, sys, math, random, time
 from pygame.locals import *
 difficulty = 2
+megaspeed = 1.15
 
 try:
     import pygame
@@ -29,7 +30,7 @@ class Ball(pygame.sprite.Sprite):
         elif (difficulty == 2):
             self.speed = 8
         elif (difficulty == 3):
-            self.speed = 15
+            self.speed = 17
         self.position = (498, 380)
 
 class Bat(pygame.sprite.Sprite):
@@ -37,14 +38,15 @@ class Bat(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         if (len(sys.argv) == 2):
             if (sys.argv[1] == '--fernand'):
-                self.image = pygame.image.load('images/player.bmp')
-                self.rect = pygame.image.load('images/player.bmp').get_rect()
+                self.image = pygame.image.load('images/playerf.bmp')
+                self.rect = pygame.image.load('images/playerf.bmp').get_rect()
             else:
                 self.image = pygame.image.load('images/player.bmp')
                 self.rect = pygame.image.load('images/player.bmp').get_rect()
         else:
             self.image = pygame.image.load('images/player.bmp')
             self.rect = pygame.image.load('images/player.bmp').get_rect()
+            self.position = (x, 300)
         self.speed = 20
         self.position = (x, 300)
     def moveup(self):
@@ -64,7 +66,13 @@ def menu(screen):
     fontE = pygame.font.Font(None, 45)
     fontS = pygame.font.Font(None, 30)
 
-    title = fontH.render("PONG WITHOUT PING", 1, (255, 255, 255))
+    if (len(sys.argv) == 2):
+        if (sys.argv[1] == '--fernand'):
+            title = fontH.render("HELLPONG", 1, (255, 255, 255))
+        else:
+            title = fontH.render("PONG WITHOUT PING", 1, (255, 255, 255))
+    else:
+        title = fontH.render("PONG WITHOUT PING", 1, (255, 255, 255))
     by = fontT.render("By", 1, (255, 255, 255))
     ant = fontT.render("Antoine BACHE &", 1, (255, 255, 255))
     lud = fontT.render("Ludovic PETRENKO", 1, (255, 255, 255))
@@ -73,7 +81,13 @@ def menu(screen):
     opt = fontS.render("Press o for options", 1, (255, 255, 255))
     opt2 = fontS.render("and controls", 1, (255, 255, 255))
 
-    screen.blit(title, (512, 150))
+    if (len(sys.argv) == 2):
+        if (sys.argv[1] == '--fernand'):
+            screen.blit(title, (666, 150))
+        else :
+            screen.blit(title, (521, 150))
+    else:
+        screen.blit(title, (512, 150))
     screen.blit(by, (68, 660))
     screen.blit(ant, (80, 690))
     screen.blit(lud, (92, 720))
@@ -153,11 +167,21 @@ def start_game(background, screen, left_corner_left, score1, score2, i):
     BLACK = (0, 0, 0)
     RED = (200, 0, 0)
     GREY = (102, 102, 102)
+    global megaspeed
     
     ball = Ball()
-    player1 = Bat(15)
-    player2 = Bat(980)
+    if (len(sys.argv) == 2):
+        if (sys.argv[1] == '--fernand'):
+            player1 = Bat(15)
+            player2 = Bat(920)
+        else:
+            player1 = Bat(15)
+            player2 = Bat(980)
+    else:
+        player1 = Bat(15)
+        player2 = Bat(980)
     direction = [1, -1]
+    boum = pygame.mixer.Sound("sound/boum.ogg")
     if (len(sys.argv) == 2):
         if ((sys.argv[1] == '--fernand') & (i == 1)):
             music = pygame.mixer.Sound("sound/playf.ogg")
@@ -192,16 +216,41 @@ def start_game(background, screen, left_corner_left, score1, score2, i):
             elif event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-        if ((ball.position[1] >= 745) | (ball.position[1] <= 34)):
-            j = -j
-        elif (((ball.position[1] >= player1.position[1]) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 20)) | ((ball.position[1] >= player2.position[1]) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 25) & (ball.position[0] <= player2.position[0] + 25))):
-            i = -i
-            hitsound.play()
-        if (ball.position[0] > 1000):
+        if (len(sys.argv) == 2):
+            if (sys.argv[1] == '--fernand'):
+                if ((ball.position[1] >= 715) | (ball.position[1] <= 34)):
+                    j = -j
+            else:
+                if ((ball.position[1] >= 745) | (ball.position[1] <= 34)):
+                    j = -j
+        else:
+            if ((ball.position[1] >= 745) | (ball.position[1] <= 34)):
+                j = -j
+        if (len(sys.argv) == 2):
+            if (sys.argv[1] == '--fernand'):
+                if (((ball.position[1] >= player1.position[1] - 30) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 90)) | ((ball.position[1] >= player2.position[1] - 15) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 50) & (ball.position[0] <= player2.position[0] + 25))):
+                    i = -i
+                    ball.speed = ball.speed * megaspeed
+                    hitsound.play()
+            else:    
+                if (((ball.position[1] >= player1.position[1] - 15) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 20)) | ((ball.position[1] >= player2.position[1] - 15) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 25) & (ball.position[0] <= player2.position[0] + 25))):
+                    i = -i
+                    ball.speed = ball.speed * megaspeed
+                    hitsound.play()
+        else:    
+            if (((ball.position[1] >= player1.position[1] - 15) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 20)) | ((ball.position[1] >= player2.position[1] - 15) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 25) & (ball.position[0] <= player2.position[0] + 25))):
+                i = -i
+                ball.speed = ball.speed * megaspeed
+                hitsound.play()
+        if (ball.position[0] >= 980):
             score1 += 1
+            boum.play()
+            time.sleep(1.5)
             start_game(background, screen, left_corner_left, score1, score2, 2)
         elif (ball.position[0] < 0):
             score2 += 1
+            boum.play()
+            time.sleep(1.5)
             start_game(background, screen, left_corner_left, score1, score2, 2)
         if (score1 == 10):
             win_screen(1, background, screen, left_corner_left)
@@ -217,6 +266,7 @@ def start_game(background, screen, left_corner_left, score1, score2, i):
 def options(background, screen, left_corner_left):
     BLACK = (0, 0, 0)
 
+    global difficulty
     screen.fill(BLACK)
     screen.blit(background, left_corner_left)
     options_display(screen)
@@ -226,17 +276,14 @@ def options(background, screen, left_corner_left):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_RETURN:
-                    main()
+                    main(2)
                 if event.key == K_F1:
-                    global difficulty
                     difficulty = 1
                     options_display(screen)
                 if event.key == K_F2:
-                    global difficulty
                     difficulty = 2
                     options_display(screen)
                 if event.key == K_F3:
-                    global difficulty
                     difficulty = 3
                     options_display(screen)
                 if event.key == K_ESCAPE:
@@ -248,27 +295,31 @@ def options(background, screen, left_corner_left):
         pygame.display.update()
     pygame.event.pump()
 
-def main():
+def main(i):
     pygame.init()
     screen = pygame.display.set_mode((1024, 768))
     background = pygame.Surface(screen.get_size())
     if (len(sys.argv) == 2):
         if (sys.argv[1] == '--fernand'):
             background = pygame.image.load("images/backgroundf.bmp")
+            pygame.display.set_caption('HELLPONG \\m/')
         else:
             background = pygame.image.load("images/background.bmp")
+            pygame.display.set_caption('Pong without ping')
     else:
         background = pygame.image.load("images/background.bmp")
+        pygame.display.set_caption('Pong without ping')
     left_corner_left = (0, 0)
     BLACK = (0, 0, 0)
     GREY = (127, 127, 127)
     RED = (188, 14, 14)
     score1 = 0
     score2 = 0
-    pygame.mixer.music.load("sound/menu.ogg")
-    pygame.mixer.music.play()
+    if (i == 1):
+        pygame.mixer.music.load("sound/menu.ogg")
+        pygame.mixer.music.play()
 
-    pygame.display.set_caption('Pong without ping')
+
     screen.blit(background, left_corner_left)
     menu(screen)
     pygame.display.flip()
@@ -291,4 +342,4 @@ def main():
     pygame.event.pump()
 
 if (__name__ == "__main__"):
-    main()
+    main(1)
