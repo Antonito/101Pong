@@ -255,7 +255,7 @@ def start_game(background, screen, left_corner_left, score1, score2, i):
         if (score1 == 10):
             win_screen(1, background, screen, left_corner_left)
         elif (score2 == 10):
-            win_screen(1, background, screen, left_corner_left)
+            win_screen(2, background, screen, left_corner_left)
         ball.position = (ball.position[0] + ball.speed * i, ball.position[1] + ball.speed * j)
         screen.blit(ball.image, ball.position)
         screen.blit(player1.image, player1.position)
