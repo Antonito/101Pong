@@ -4,6 +4,7 @@ from pygame.locals import *
 difficulty = 2
 megaspeed = 1.15
 players = 2
+ballacc = "Yes"
 
 try:
     import pygame
@@ -125,6 +126,9 @@ def options_display(screen):
     diff2 = fontT.render("(Press F1, F2 or F3)", 1, (255, 255, 255))
     mode = fontH.render("Players = %d" %players, 1, (255, 255, 255))
     mode2 = fontT.render("(Press F4)", 1, (255, 255, 255))
+    ball = fontH.render("Ball acceleration = %s" %ballacc, 1, (255, 255, 255))
+    ball2 = fontT.render("(Press F5)", 1, (255, 255, 255))
+
     
     screen.fill((0, 0, 0))
     screen.blit(OPT, (425, 50))
@@ -134,6 +138,8 @@ def options_display(screen):
     screen.blit(diff2, (56, 390))
     screen.blit(mode, (51, 420))
     screen.blit(mode2, (56, 460))
+    screen.blit(ball, (51, 490))
+    screen.blit(ball2, (56, 525))
     screen.blit(start, (51, 650))
     screen.blit(rld, (51, 675))
     screen.blit(escp, (51, 700))
@@ -379,6 +385,8 @@ def options(background, screen, left_corner_left):
 
     global difficulty
     global players
+    global ballacc
+    global megaspeed
     screen.fill(BLACK)
     screen.blit(background, left_corner_left)
     options_display(screen)
@@ -403,6 +411,14 @@ def options(background, screen, left_corner_left):
                         players = 2
                     else:
                         players = 1
+                    options_display(screen)
+                if event.key == K_F5:
+                    if ballacc == "Yes":
+                        ballacc = "No"
+                        megaspeed = 1.00
+                    else:
+                        ballacc = "Yes"
+                        megaspeed = 1.15
                     options_display(screen)
                 if event.key == K_ESCAPE:
                     pygame.quit()
