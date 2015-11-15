@@ -3,6 +3,7 @@ import pygame, sys, math, random, time
 from pygame.locals import *
 difficulty = 2
 megaspeed = 1.15
+players = 2
 
 try:
     import pygame
@@ -113,7 +114,7 @@ def options_display(screen):
     fontT = pygame.font.Font(None, 36)
     fontH = pygame.font.Font(None, 48)
     fontE = pygame.font.Font(None, 45)
-    
+
     OPT = fontH.render("OPTIONS", 1, (255, 255, 255))
     P1 = fontH.render("Player 1 (left) : Move with up and down arrows keys", 1, (255, 255, 255))
     P2 = fontH.render("Player 2 (right) : Move with z and s keys", 1, (255, 255, 255))
@@ -122,13 +123,17 @@ def options_display(screen):
     start = fontT.render("Enter : Start a game / Leave \"options\"", 1, (255,255,255))
     diff = fontH.render("Difficulty = %d" %difficulty, 1, (255, 255, 255))
     diff2 = fontT.render("(Press F1, F2 or F3)", 1, (255, 255, 255))
-
+    mode = fontH.render("Players = %d" %players, 1, (255, 255, 255))
+    mode2 = fontT.render("(Press F4)", 1, (255, 255, 255))
+    
     screen.fill((0, 0, 0))
     screen.blit(OPT, (425, 50))
     screen.blit(P1, (51, 150))
     screen.blit(P2, (51, 260))
     screen.blit(diff, (51, 350))
     screen.blit(diff2, (56, 390))
+    screen.blit(mode, (51, 420))
+    screen.blit(mode2, (56, 460))
     screen.blit(start, (51, 650))
     screen.blit(rld, (51, 675))
     screen.blit(escp, (51, 700))
@@ -157,10 +162,116 @@ def win_screen(player, background, screen, left_corner_left):
                     pygame.quit()
                     sys.exit()
                 elif event.key == K_r:
-                    start_game(background, screen, left_corner_left, 0, 0, 2)
+                    if players == 2:
+                        start_game(background, screen, left_corner_left, 0, 0, 2)
+                    else:
+                        start_solo_game(background, screen, left_corner_left, 0, 0, 2)
             elif event.type == QUIT:
                 pygame.quit()
                 sys.exit() 
+    pygame.event.pump()
+
+def player_ia(ball, player2):
+    if (ball.position[1] < 640):
+        player2.position = (player2.position[0], ball.position[1] - 20)
+    else:
+        player2.position = (player2.position[0], 620)
+
+def start_solo_game(background, screen, left_corner_left, score1, score2, i):
+    BLACK = (0, 0, 0)
+    RED = (200, 0, 0)
+    GREY = (102, 102, 102)
+    global megaspeed
+    
+    ball = Ball()
+    if (len(sys.argv) == 2):
+        if (sys.argv[1] == '--fernand'):
+            player1 = Bat(15)
+            player2 = Bat(920)
+        else:
+            player1 = Bat(15)
+            player2 = Bat(980)
+    else:
+        player1 = Bat(15)
+        player2 = Bat(980)
+    direction = [1, -1]
+    boum = pygame.mixer.Sound("sound/boum.ogg")
+    if (len(sys.argv) == 2):
+        if ((sys.argv[1] == '--fernand') & (i == 1)):
+            music = pygame.mixer.Sound("sound/playf.ogg")
+            music.play()
+    hitsound = pygame.mixer.Sound("sound/hit.wav")
+    i = direction[random.randint(0,1)]
+    j = direction[random.randint(0,1)]
+    pygame.key.set_repeat(1, 1)
+    ball.position = (ball.position[0] + ball.speed * i, ball.position[1] + ball.speed * j)
+    while True:
+        pygame.time.Clock().tick(60)
+        screen.fill(BLACK)
+        screen.blit(background, (121, 100))
+        pygame.draw.rect(screen, RED, [0, 0, 1024, 0], 50)
+        pygame.draw.rect(screen, GREY, [512, 0, 0, 768], 7)
+        header_bar(screen, score1, score2)
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            player1.movedown()
+        if pygame.key.get_pressed()[pygame.K_UP]:
+            player1.moveup()
+        player_ia(ball, player2)
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                elif event.key == K_r:
+                    start_solo_game(background, screen, left_corner_left, 0, 0, 2)
+            elif event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+        if (len(sys.argv) == 2):
+            if (sys.argv[1] == '--fernand'):
+                if ((ball.position[1] >= 715) | (ball.position[1] <= 34)):
+                    j = -j
+            else:
+                if ((ball.position[1] >= 745) | (ball.position[1] <= 34)):
+                    j = -j
+        else:
+            if ((ball.position[1] >= 745) | (ball.position[1] <= 34)):
+                j = -j
+        if (len(sys.argv) == 2):
+            if (sys.argv[1] == '--fernand'):
+                if (((ball.position[1] >= player1.position[1] - 30) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 90)) | ((ball.position[1] >= player2.position[1] - 15) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 50) & (ball.position[0] <= player2.position[0] + 25))):
+                    i = -i
+                    ball.speed = ball.speed * megaspeed
+                    hitsound.play()
+            else:    
+                if (((ball.position[1] >= player1.position[1] - 15) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 20)) | ((ball.position[1] >= player2.position[1] - 15) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 25) & (ball.position[0] <= player2.position[0] + 25))):
+                    i = -i
+                    ball.speed = ball.speed * megaspeed
+                    hitsound.play()
+        else:    
+            if (((ball.position[1] >= player1.position[1] - 15) & (ball.position[1] <= player1.position[1] + 150) & (ball.position[0] >= player1.position[0] - 20) & (ball.position[0] <= player1.position[0] + 20)) | ((ball.position[1] >= player2.position[1] - 15) & (ball.position[1] <= player2.position[1] + 150) & (ball.position[0] >= player2.position[0] - 25) & (ball.position[0] <= player2.position[0] + 25))):
+                i = -i
+                ball.speed = ball.speed * megaspeed
+                hitsound.play()
+        if (ball.position[0] >= 980):
+            score1 += 1
+            boum.play()
+            time.sleep(1.5)
+            start_solo_game(background, screen, left_corner_left, score1, score2, 2)
+        elif (ball.position[0] < 0):
+            score2 += 1
+            boum.play()
+            time.sleep(1.5)
+            start_solo_game(background, screen, left_corner_left, score1, score2, 2)
+        if (score1 == 10):
+            win_screen(1, background, screen, left_corner_left)
+        elif (score2 == 10):
+            win_screen(2, background, screen, left_corner_left)
+        ball.position = (ball.position[0] + ball.speed * i, ball.position[1] + ball.speed * j)
+        screen.blit(ball.image, ball.position)
+        screen.blit(player1.image, player1.position)
+        screen.blit(player2.image, player2.position)
+        pygame.display.update()
     pygame.event.pump()
         
 def start_game(background, screen, left_corner_left, score1, score2, i):
@@ -267,6 +378,7 @@ def options(background, screen, left_corner_left):
     BLACK = (0, 0, 0)
 
     global difficulty
+    global players
     screen.fill(BLACK)
     screen.blit(background, left_corner_left)
     options_display(screen)
@@ -285,6 +397,12 @@ def options(background, screen, left_corner_left):
                     options_display(screen)
                 if event.key == K_F3:
                     difficulty = 3
+                    options_display(screen)
+                if event.key == K_F4:
+                    if players == 1:
+                        players = 2
+                    else:
+                        players = 1
                     options_display(screen)
                 if event.key == K_ESCAPE:
                     pygame.quit()
@@ -329,7 +447,10 @@ def main(i):
             if event.type == KEYDOWN:
                 if event.key == K_RETURN:
                     pygame.mixer.music.stop()
-                    start_game(background, screen, left_corner_left, score1, score2, 1)
+                    if players == 2:
+                        start_game(background, screen, left_corner_left, score1, score2, 1)
+                    else:
+                        start_solo_game(background, screen, left_corner_left, score1, score2, 1)
                 if event.key == K_o:
                     options(background, screen, left_corner_left)
                 if event.key == K_ESCAPE:
