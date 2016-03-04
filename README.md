@@ -9,6 +9,6 @@ Bonus :
         
         - Different themes (normal mode, and special theme for veyrie_f with option "--fernand")
 
-Realised in Python, with PyGame.
+Realized in Python, with PyGame.
 
 Grade : 96 + 24 ( bonus )
