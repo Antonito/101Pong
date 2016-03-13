@@ -11,4 +11,7 @@ Bonus :
 
 Realized in Python, with PyGame.
 
+![Game Screenshot](/Pong without ping_002.png?raw=true "Main Menu")
+![Game Screenshot](/Pong without ping_003.png?raw=true "Main Menu")
+
 Grade : 96 + 24 ( bonus )
